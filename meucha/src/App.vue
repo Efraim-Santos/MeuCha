@@ -5,10 +5,12 @@
 </template>
 
 <script>
-import MeuCha from './main/MeuCha'
-export default {
-    components: {MeuCha}
-}
+    import MeuCha from './main/MeuCha'
+    
+    export default {
+        components: {MeuCha}
+    }
+    
 </script>
 
 <style>
