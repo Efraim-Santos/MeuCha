@@ -14,16 +14,19 @@
 </script>
 
 <style>
-    body {
+    html, 
+    body, 
+    div#app{
         margin: 0;
-        padding: 0;  
-        width: 100%;
-        height: 100vh;
+        padding: 0;
         box-sizing: border-box;
+        width: 100%;
+        height: 100%;
     }
-    /* @font-face {
-        font-family: ;
-        src: url();
-    } */
-    
+    div#app{
+        background: #360033;  
+        background: -webkit-linear-gradient(to top, #0b8793, #360033); 
+        background: linear-gradient(to top, #0b8793, #360033);
+    }  
+   
 </style>
