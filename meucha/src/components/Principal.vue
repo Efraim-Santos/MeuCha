@@ -249,21 +249,21 @@
         height: inherit;
         width: 100%;
     } 
-    #coluna1 {
+    /* #coluna1 {
         position: absolute;
         top: 0;
         left: 0;
         height: 98vh; 
         width: 300px;
         border: 2px solid red
-    }
-    #coluna1 .v-navigation-drawer{
+    } */
+    /* #coluna1 .v-navigation-drawer{
         position: absolute;
         top: 0;
         left: 0;
         max-width: 300px;
         border: 2px solid red
-    }
+    } */
     /* ############################################################################ */
     @media screen and (max-width: 600px) {
         /* #coluna1 {
