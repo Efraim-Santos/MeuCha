@@ -1,33 +1,80 @@
 <template>
-  <div class="front">
-      <img src="../img/img_teste.png" alt="">
-      <div class="logo" v-show="!entrar">
-            <h1>Meu Chá</h1>
-            <h1>Efraim & Leisle</h1>
-            <button @click="entrar = !entrar">Entrar</button>
-      </div>
-        <div id="validar" v-show="!entrar">
-            <h2>Valide Seu Convite</h2>
-            <form action="">
-                <label for="">Digite Seu Nome: </label>
-                <input type="text" placeholder="Exemplo: Efraim Santos">
-                <label for="">Digite Seu Numero: </label>
-                <input type="nunber" name="" id="" placeholder="Exemplo: 79 98888-8888">
-            </form>
-            <button @click="'./principal'">Entrar</button>
-            <button @click="entrar = !entrar">Voltar</button>
-         </div>
-  </div>
+    <v-container fluid id="container">
+        <!-- <v-row align="center" justify="center" id="rowLogo" v-if="!logado"> -->
+        <v-row align="center" justify="center" id="rowLogo" v-if="false">
+            <!-- <img src="../img/img_teste.png" height="100%" style="opacity: 0.3" alt="imagem">  -->
+            <v-col cols="12" id="logo" v-show="!entrar">
+                <h1 class="white--text text-center">{{titulo}}</h1>
+                <h1 class="white--text text-center">{{subTitulo}}</h1>
+                <v-row class="mt-8" justify="center">
+                    <v-btn class="ma-2 white--text" large outlined @click="entrar = !entrar">Entrar</v-btn>
+                </v-row>
+            </v-col>
+            <v-col class="px-10 py-10" cols="10" sm="6" id="validar" v-show="entrar" style="outline: 2px solid rgba(255, 255, 255, 0.5)">
+                <h2 class="white--text text-center mb-6">{{valide}}</h2>
+                <v-form>
+                    <v-text-field 
+                        v-model="nome" 
+                        label="Nome:" 
+                        :rules="[() => !! nome || 'FAVOR PREENCHER ESSE CAMPO']" 
+                        color="white" 
+                        placeholder="Nome e Sobrenome: Efraim Santos"
+                    ></v-text-field>
+                    <v-text-field 
+                        v-model="numero" 
+                        :rules="[() => !! numero || 'FAVOR PREENCHER ESSE CAMPO']" 
+                        label="Telefone:" 
+                        color="white" 
+                        placeholder="Ex: Efraim"
+                        required
+                        ></v-text-field>
+                        <v-row justify="space-between" class="mx-1 mt-2">
+                            <v-btn class="white--text" outlined @click="usuario"> Validar </v-btn>
+                            <v-btn class="white--text" outlined @click="entrar = !entrar; alert=false">Voltar</v-btn>
+                        </v-row>
+                </v-form> 
+                <v-alert type="error" border="left" class="mt-5" v-if="alert"> 
+                    Dados Invalidos
+                </v-alert>
+            </v-col>
+        </v-row>
+
+         <v-container id="containerPrincipal" fluid>
+            <Principal :nome="nome"/>
+        </v-container>
+    </v-container>
+   
 </template>
 
 <script>
-    // import Principal from './Principal'
+    import Principal from './Principal'
     export default {
-        // components: {Principal},
+        components: {
+            Principal
+        },
         data: function() {
             return {
-                entrar: false
+                titulo: "Meu Chá",
+                subTitulo: "Efraim & Leisle",
+                valide: "Valide Seu Convite",
+                nome: "",
+                numero: "",
+                entrar: false,
+                logado: false,
+                alert: false,
+                convidados: ['79988689723', '79988057812', '79988324744', '79988386934']
             }
+        },
+        methods:  {
+           usuario(){
+               if(this.nome != '' && this.numero != ''){
+                   this.convidados.forEach(element => {
+                        this.numero == element ? this.logado = !this.logado : this.alert = true
+                    });
+               }else {
+                   !this.alert ? this.alert = !this.alert : this.alert
+               }
+           }
         }
     }
 </script>
@@ -41,103 +88,48 @@
         font-family: Indie_Flower;
         src: url('../fonts/Indie_Flower/IndieFlower-Regular.ttf');
     }
-    :root{
-        --corInput: rgba(0, 0, 0, 0.4);
+    #container{
+        padding: 0;
+        margin: 0;
     }
-    .front {
-        width: 100%;
+    #rowLogo{
         height: 100%;
     }
-    .logo button,
-    .front div,
-    .front img,
-    div#validar {
-        position: relative;
+    /* #rowLogo img{
+        position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }  */
+    #container{
+        height: 100vh !important;
     }
-    .front img {
-        height: 100%; 
-        opacity: .3;
+    #logo,
+    #validar {
+        position: relative;
     }
-    .logo h1 {
+    #logo h1 {
         font-family: 'Indie_Flower';
-        font-size: 7vw;
-        margin: 0;
-        color: #ffffff;
-        text-align: center;
-        font-weight: bold;
+        font-size: 6vw;
         text-shadow: black 0.1em 0.1em 0.3em;
     }
-    .logo button,
-    div#validar button{
-        margin-top: 50px;
-        border-radius: 10px;
-        border: 4px solid rgba(0, 0, 0, 0.6);
-        background-color: rgba(255, 255, 255, 0);
-        padding: 10px 30px;
-        font-weight: bold;
-        color: #ffffff;
-        font-size: 1.5vw;
-    }
-    .logo button,
-    div#validar button {
-        transition-duration: 0.4s;
-    }
-    .logo button:hover,
-    div#validar button:hover {
-        background-color: var(--corInput); /* Green */
-        color: white;
-    }
-    /* ############################################################################ */
-    div#validar,
-    .front img {
-        position: absolute;
-    }
-    div#validar h2 {
-        font-size: 2vw;
-        text-align: center;
-        color: #ffffff;
-        font-family: 'Lemonada';
-    }
-    div#validar form {
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        padding: 6vw 10vw;
+    #validar input::placeholder {
+        color: rgba(0, 0, 0, 0.8)
     }
     div#validar input{
-        display: block;
-        margin: 20px 0;
-        background-color: var(--corInput);
-        border: 2px solid rgba(0, 0, 0, 0.5);
-        border-radius: 4px;
-        height: 30px;
-        width: 100%;
-        color: #ffffff
-    }
-    ::placeholder{
-        text-align: center;
+        margin-top: 10px;
+        background-color: rgba(0, 0, 0, 0.2);
     }
     div#validar label{
-        font-size: 1.5vw;
+        font-size: 1.6vw;
         font-weight: bold;
-        color: white;
+        color: #000000;
         font-family: 'Lemonada';
     } 
-    div#validar button:last-of-type{
-        float: right;
-    }   
     /* ############################################################################ */
     @media screen and (max-width: 600px) {
-        .logo h1 {
+        #logo h1 {
             font-size: 12vw;
-        }
-        .logo button,
-         div#validar button{
-            font-size: 4vw;
-        }
-        div#validar {
-            width: 70%;
         }
         div#validar h2 {
             font-size: 6vw;
@@ -145,8 +137,7 @@
         div#validar label{
             font-size: 3.5vw;
         }
-         .front img {
-            height: 100%;
+        #rowLogo img{
             width: 100%;
         }
     }

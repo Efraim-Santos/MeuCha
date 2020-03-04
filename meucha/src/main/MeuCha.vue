@@ -1,19 +1,26 @@
 <template>
-    
-    <!-- <Front /> -->
-    <Principal />
-    
-    
+    <v-app>
+        <img src="../img/img_teste.png" height="100%" style="opacity: 0.4" alt="imagem"> 
+        <Front />
+    </v-app>
 </template>
 
 <script>
-    // import Front from '../components/Front'
-    import Principal from '../components/Principal'
+    import Front from '../components/Front'
+    // import Principal from '../components/Principal'
     export default {
-        components: {Principal}
+        components: {
+            // Principal, 
+            Front
+        }
     }
 </script>
 
-<style>
-
+<style :scoped>
+    img{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    } 
 </style>

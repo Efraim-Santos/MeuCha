@@ -15,13 +15,13 @@
 
 <style>
     html, 
-    body, 
-    div#app{
+    body{
         margin: 0;
         padding: 0;
         box-sizing: border-box;
         width: 100%;
-        height: 100%;
+        height: 100vh;
+        overflow: hidden !important;
     }
     div#app{
         background: #360033;  
