@@ -1,7 +1,7 @@
 <template>
     <v-container fluid id="container">
-        <!-- <v-row align="center" justify="center" id="rowLogo" v-if="!logado"> -->
-        <v-row align="center" justify="center" id="rowLogo" v-if="false">
+        <v-row align="center" justify="center" id="rowLogo" v-if="!logado">
+        <!-- <v-row align="center" justify="center" id="rowLogo" v-if="false"> -->
             <!-- <img src="../img/img_teste.png" height="100%" style="opacity: 0.3" alt="imagem">  -->
             <v-col cols="12" id="logo" v-show="!entrar">
                 <h1 class="white--text text-center">{{titulo}}</h1>
@@ -25,8 +25,9 @@
                         :rules="[() => !! numero || 'FAVOR PREENCHER ESSE CAMPO']" 
                         label="Telefone:" 
                         color="white" 
-                        placeholder="Ex: Efraim"
+                        placeholder="Ex: 79988887777"
                         required
+                        @keyup.enter="usuario"
                         ></v-text-field>
                         <v-row justify="space-between" class="mx-1 mt-2">
                             <v-btn class="white--text" outlined @click="usuario"> Validar </v-btn>
@@ -39,7 +40,7 @@
             </v-col>
         </v-row>
 
-         <v-container id="containerPrincipal" fluid>
+         <v-container id="containerPrincipal" v-if="true" fluid>
             <Principal :nome="nome"/>
         </v-container>
     </v-container>
@@ -119,6 +120,7 @@
     div#validar input{
         margin-top: 10px;
         background-color: rgba(0, 0, 0, 0.2);
+        color: #ffffff;
     }
     div#validar label{
         font-size: 1.6vw;
