@@ -6,8 +6,9 @@
 
 <script>
     import MeuCha from './main/MeuCha'
-    
+
     export default {
+        name: 'App',
         components: {MeuCha}
     }
     

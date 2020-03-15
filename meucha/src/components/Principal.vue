@@ -90,7 +90,7 @@
                                     </v-row>
                                     <v-row>
                                         <h3 class="black--text ">2020</h3>    
-                                        <h4 class="ml-4 text-center pt-7 pl-5">Às 19:00<br>Horas</h4>
+                                        <h4 class="ml-4 text-center pt-7 pl-5">Às 17:00<br>Horas</h4>
                                     </v-row>
                                 </v-col>
                                 <v-col cols="12" class="white--text">
@@ -114,10 +114,10 @@
                                     </v-row>
                                     <v-row>
                                         <h3 class="black--text">2020</h3>    
-                                        <h4 class="ml-4 text-center pt-7 pl-5" >Às 19:00<br>Horas</h4>
+                                        <h4 class="ml-4 text-center pt-7 pl-5" >Às 17:00<br>Horas</h4>
                                     </v-row>
                                      <p class="text-center">
-                                        <v-btn rounded color="primary" dark target="_blank" @click="presenca = true">Confirmar Presença</v-btn>
+                                        <v-btn rounded color="primary" dark target="_blank" @click="confirmarPresenca()">Confirmar Presença</v-btn>
                                     </p>
                                     <p class="px-8 mt-12" v-if="presenca">
                                         <v-alert type="success" border="left" class="mt-5 mx-auto" > 
@@ -142,17 +142,28 @@
                                         <v-list-item-group v-model="item" color="primary">
                                             <v-list-item 
                                                     two-line dark 
-                                                    v-for="presente in presentes"
-                                                    :key=presente.titulo
+                                                    v-for="presente in totals.id"
+                                                    :key= presente
                                                     :nav="nav"
-                                                    @click="selecionado(presente)"
+                                                    @click="selecionar(presente)"
+                                                    :disabled="selecionado(presente)"
                                                 >
                                                     <v-list-item-content >
                                                         <v-list-item-title>
                                                             <v-icon small>fas fa-caret-right</v-icon> 
-                                                                {{presente.titulo}}
-                                                            <span class="float-right pt-3" v-if="presente.selecionar">
+                                                                {{totals.titulo[presente]}}
+                                                            <span class="pt-3 float-right" v-if="verificar(presente)">
                                                                 <v-icon>fas fa-check</v-icon>
+                                                            </span>
+                                                            <span class="pt-3 float-right" v-if="totals.numero_selecionado[presente] != 0">
+                                                                <span v-if="totals.numero_selecionado[presente] != tel">
+                                                                    Já selecionado
+                                                                    <v-icon>far fa-times-circle</v-icon>
+                                                                </span>
+                                                                 <span v-if="totals.numero_selecionado[presente] == tel">
+                                                                    Você selecionou
+                                                                    <v-icon>far fa-check-square</v-icon>
+                                                                </span>
                                                             </span>
                                                         </v-list-item-title>
                                                         <v-list-item-subtitle>
@@ -161,12 +172,18 @@
                                                         </v-list-item-subtitle>
                                                         <v-list-item-subtitle>
                                                             <v-btn class="ma-2" tile color="indigo" dark x-small
-                                                                v-for="dicas in presente.dicas"
-                                                                :key="dicas"
-                                                                :href="dicas[1]"
+                                                                :href="totals.link_1[presente]"
                                                                 target="_blank"
+                                                                v-if="totals.link_1[presente] != ''"
                                                             >
-                                                                {{dicas[0]}}
+                                                                {{totals.dica_1[presente]}}
+                                                            </v-btn>
+                                                               <v-btn class="ma-2" tile color="indigo" dark x-small
+                                                                :href="totals.link_2[presente]"
+                                                                target="_blank"
+                                                                v-if="totals.link_2[presente] != ''"
+                                                            >
+                                                                {{totals.dica_2[presente]}}
                                                             </v-btn>
                                                         </v-list-item-subtitle>
                                                     </v-list-item-content>
@@ -175,7 +192,7 @@
                                     </v-list>
                                 </v-card>
                             <v-row id="botaoSalvar" class="mt-3">
-                                <v-btn small color="primary" class="mx-auto" dark><v-icon color="red">mdi-heart</v-icon>SALVAR </v-btn>
+                                <v-btn small color="primary" class="mx-auto" @click="salvar()" dark><v-icon color="red">mdi-heart</v-icon>SALVAR </v-btn>
                             </v-row>
                             </v-row>
                         </v-row>
@@ -187,36 +204,46 @@
 
 <script>
     export default {    
-        props: ['nome'],
+        props: [
+            'nome',
+            'tel'        
+        ],
+        created(){
+            this.getPresentes(),      
+            this.getUsuarios()
+        },
+        computed: {
+            totals (){
+                const {expenses: exp} = this
+                const values = {
+                    id: exp.map(i => i.id),
+                    titulo: exp.map(i => i.titulo),
+                    dica_1: exp.map(i => i.nome_1),
+                    link_1: exp.map(i => i.link_1),
+                    dica_2: exp.map(i => i.nome_2),
+                    link_2: exp.map(i => i.link_2),
+                    numero_selecionado: exp.map(i => i.numero_selecionado),
+                    selecionar: exp.map(i => i.selecionar)
+                }
+                return values
+            }       
+        },
         data: function (){
             return {
-                teste: "Meu chá",
                 drawer: true,
                 items: [
                     { titulo: 'Inicio', icon: 'mdi-account',  exibir: true },
                     { titulo: 'Lista de Presentes', icon: 'fas fa-gift', exibir: false  },
                     { titulo: 'Informações', icon: 'fas fa-info-circle', exibir: false  },
                     { titulo: 'Confirmar presença', icon: 'fas fa-check', exibir: false }
+                    // { titulo: 'Quem Con', icon: 'fas fa-check', exibir: false }
                 ],
                 mini: true,
-                presentes: [
-                    {titulo: "Aparelho de jantar de porcelana", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Jogo de sobremesa", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Bandeja", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Açucareiro", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Aparelho de fondue", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Conjunto de Assadeiras", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Jogo de facas Tramontina", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Boleira de vidro", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Bomboniere", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Garrafa térmica para café", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Jogo de copos para o dia-a-dia", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Chaleira", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Jarra para suco", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]},
-                    {titulo: "Conjunto de bowls (para sopa)", selecionar: false, dicas: [["Americanas", "https://www.americanas.com.br/produto/19370173/relogio-x-games-masculino-xmgs1019-c2kx?WT.srch=1&acc=e789ea56094489dffd798f86ff51c7a9&cor=Dourado&epar=bp_pl_00_go_rel_todas_geral_gmv&gclid=CjwKCAiAy9jyBRA6EiwAeclQhIVqdPVuTmDzOrPWZTwcDXdjjYH-MpFa3fz0wq9EVV64J_C-3a1ECRoCBXkQAvD_BwE&i=582544e7eec3dfb1f80ebcba&o=584d0db4eec3dfb1f8757a5b&opn=YSMESP&sellerid=11626336000180&wt.srch=1"], ["Magazine", "https://www.magazineluiza.com.br/mala-de-viagem-yins-media-com-giro-360o-ys21055c-m-cinza/p/223890600/es/mala/"]]}
-                ],
+                expenses: [],
                 presenca: false,
                 logado: true,
+                selecionarId: [],
+                bdUsuarios: []
             }
         },
         methods: {
@@ -229,15 +256,84 @@
                     }
                 })
             },
-            selecionado(aux){
-                this.presentes.forEach(element => {
-                    if(aux.titulo == element.titulo && aux.selecionar == false){
-                        element.selecionar = true
-                    } else if(aux.titulo == element.titulo && aux.selecionar == true){
-                        element.selecionar = false
+            selecionado(valor){
+                if(this.totals.numero_selecionado[valor] == 0){
+                    return false
+                }else if(this.totals.numero_selecionado[valor] == this.tel){
+                    return false
+                }else{
+                    return true
+                }
+            },
+            selecionar(valor){
+                let existe = 0
+                this.selecionarId.forEach((element, id) => {
+                    if(element == valor){
+                        existe = id +1
                     }
                 })
-            }  
+                if(existe == 0){
+                    this.selecionarId.push(valor)
+                }else if(existe != 0){
+                    this.selecionarId.splice(existe -1, 1)
+                }   
+            },
+            verificar(valor){
+                let aux = false
+                this.selecionarId.forEach((element) => {
+                    if(element == valor){
+                        aux = true
+                    }
+                })
+                return aux
+            },
+            salvar(){
+               console.log(this.selecionarId)
+               let id = 0
+               this.selecionarId.forEach(element => {
+                   id = ("00" + (element)).slice(-2)
+                   console.log(element)
+                   console.log(id)                   
+                   if(this.totals.numero_selecionado[element] == this.tel){  
+                        this.setPresente(id, element, 0)
+                   }else{
+                        this.setPresente(id, element, this.tel)
+                   }
+               })
+            //    alert("Obrigado! Você acabou de selecior o(s) presente(s): " this.totals.)
+               this.selecionarId = []
+               this.getPresentes()
+            },
+            confirmarPresenca(){
+                const {bdUsuarios: usu} = this
+                usu.map(element => {
+                    if(this.tel == element.telefone){
+                       const ref = this.$firebase.database().ref('id_usuarios/id_usu_'+element.id)
+                        ref.update({ confirmaPresenca: true });
+                        this.presenca = true
+                    }
+                })
+            },
+            getPresentes(){
+                const ref = this.$firebase.database().ref('id_presentes/')
+                
+                ref.once('value', data => {
+                    const values = data.val()
+                    this.expenses = Object.keys(values).map(i => values[i])
+                })
+            },
+            setPresente(id, id_2, tel){
+                const ref = this.$firebase.database().ref('id_presentes/id_presente_'+id)
+                ref.update({ id: id_2, numero_selecionado: tel });
+            },
+            getUsuarios(){
+                const ref = this.$firebase.database().ref('id_usuarios/')
+                
+                ref.once('value', data => {
+                    const values = data.val()
+                    this.bdUsuarios = Object.keys(values).map(i => values[i])
+                })
+            },
         }
     }
 </script>

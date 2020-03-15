@@ -41,7 +41,7 @@
         </v-row>
 
          <v-container id="containerPrincipal" v-if="true" fluid>
-            <Principal :nome="nome"/>
+            <Principal :nome="nome" :tel="numero"/>
         </v-container>
     </v-container>
    
@@ -53,6 +53,19 @@
         components: {
             Principal
         },
+        created(){
+            this.getUsuarios()
+        },
+        // computed: {
+        //     totals (){
+        //         const {expenses: exp} = this
+        //         const values = {
+        //             nome: exp.map(i => i.nome),
+        //             tel: exp.map(i => i.telefone)
+        //         }
+        //         return values
+        //     }       
+        // },
         data: function() {
             return {
                 titulo: "Meu Chá",
@@ -63,19 +76,43 @@
                 entrar: false,
                 logado: false,
                 alert: false,
-                convidados: ['79988689723', '79988057812', '79988324744', '79988386934']
+                expenses: []
             }
         },
         methods:  {
            usuario(){
                if(this.nome != '' && this.numero != ''){
-                   this.convidados.forEach(element => {
-                        this.numero == element ? this.logado = !this.logado : this.alert = true
+                    const {expenses: exp} = this
+                    exp.map(element => {
+                       this.numero = parseInt(this.numero)
+                    //    console.log(this.numero == element.telefone)
+                       if(this.numero == element.telefone){
+                           this.logado = true
+                           if(element.nome == ""){
+                               //acidionar nome
+                              this.setUsuarios(element.id, this.nome, element.telefone)
+                           }else{
+                               this.nome = element.nome
+                           }
+                       }
                     });
+                    !this.logado ? this.alert = true : this.alert
                }else {
                    !this.alert ? this.alert = !this.alert : this.alert
                }
-           }
+           },
+            getUsuarios(){
+                const ref = this.$firebase.database().ref('id_usuarios/')
+                
+                ref.once('value', data => {
+                    const values = data.val()
+                    this.expenses = Object.keys(values).map(i => values[i])
+                })
+            },
+            setUsuarios(id, nome, tel){
+                const ref = this.$firebase.database().ref('id_usuarios/')
+                ref.child('id_usu_'+id).update({id, nome, telefone: tel})
+            }
         }
     }
 </script>
@@ -96,12 +133,6 @@
     #rowLogo{
         height: 100%;
     }
-    /* #rowLogo img{
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }  */
     #container{
         height: 100vh !important;
     }
