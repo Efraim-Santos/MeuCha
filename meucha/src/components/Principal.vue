@@ -6,7 +6,7 @@
                 <v-spacer></v-spacer>
                 <!-- <p class="text-center" style="border: 2px solid red; width: 100%; margin-left: 56px">alinhamento</p> -->
                 <span>
-                    Seja Bem-Vindo <span id="barNome" class="red--text">{{nome}} !!</span>
+                    Seja Bem-Vindo 2 <span id="barNome" class="red--text">{{nome}} !!</span>
                 </span>
                 <v-btn icon class="coracaoMOB">
                     <v-icon>mdi-heart</v-icon>
